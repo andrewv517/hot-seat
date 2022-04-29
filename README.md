@@ -1,4 +1,6 @@
-# vuegamets
+# Hot Seat
+A jackbox style implementation of the card game Hot Seat using
+Vue.js and socket.io.
 
 ## Project setup
 ```
