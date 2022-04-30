@@ -1,6 +1,6 @@
 <template>
   <div>
-    <InitialScreenHeader/>
+    <InitialScreenHeader @ready="startGame"/>
 
     <PregameScreen :gameState="gameState" :gameId="gameid" v-if="!gameReady" />
     <div class="p-6" v-else>
@@ -47,6 +47,10 @@ interface GameState {
 SocketioService.socket.on('update', (state: GameState) => {
   gameState.value = state;
 });
+
+const startGame = () => {
+  gameReady.value = true;
+}
 
 const leaveGame = () => {
   console.log('attempting to leave');

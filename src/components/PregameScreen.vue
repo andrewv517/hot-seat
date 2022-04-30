@@ -1,33 +1,43 @@
 <template>
   <div class="w-full">
-    <button
-        class="fixed top-0 left-0 m-4 p-2 pl-4 pr-4 rounded-full drop-shadow-lg bg-red-800 text-amber-100"
-        @click="leaveGame"
-    >
-      X
-    </button>
-    <p class="text-xl text-white text-center">Code: {{gameId}}</p>
+    <p class="text-2xl font-semibold text-white text-center">Code: {{gameId}}</p>
     <div class="w:5/6 sm:w-2/3 md:w-1/3 m-auto p-6 grid grid-cols-2 gap-4">
-      <p class="text-lg text-white">Players:</p>
+      <button
+          class="p-2 pl-4 pr-4 rounded-xl drop-shadow-lg bg-red-700 text-amber-100"
+          @click="leaveGame"
+      >
+        Leave Game
+      </button>
+      <button
+          class="p-2 pl-4 pr-4 rounded-xl drop-shadow-lg bg-green-500 text-amber-100"
+          @click="startGame"
+          v-if="gameState.players[SocketioService.socket.id].number === 1"
+      >
+        Start Game
+      </button>
+      <div v-else></div>
+      <p class="text-2xl font-semibold text-white">Players:</p>
       <div></div>
-      <p
+      <div
           v-for="player in gameState.players"
           :key="player"
-          class="player bg-slate-400 rounded-lg p-2"
+          class="player bg-slate-400 font-semibold rounded-lg p-2 drop-shadow-xl text-slate-800"
       >
         {{player.number}}. {{player.name}}
-      </p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {defineProps} from "vue";
+import {defineProps, defineEmits} from "vue";
 import SocketioService from "@/socketio.service";
 const props = defineProps<{
   gameState: GameState,
   gameId: string,
 }>()
+
+const emit = defineEmits(['start']);
 
 interface PlayerData {
   name: string,
@@ -43,6 +53,9 @@ const leaveGame = () => {
   SocketioService.socket.emit('leave');
 }
 
+const startGame = () => {
+  emit('start');
+}
 
 console.log(props.gameId);
 </script>
