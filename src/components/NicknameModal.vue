@@ -1,10 +1,12 @@
 <template>
   <div id="container" class="fixed top-0 right-0 left-0 z-50 w-full h-full bg-black/60">
-    <div class="relative w-full h-full p-4 pb-6 mt-[15%] m-auto w-[75%] sm:w-[50%] md:w-[30%] h-fit bg-gray-700 rounded-lg shadow-2xl space-y-2">
+    <div class="relative w-full h-fit p-4 pb-6 mt-[40%] sm:mt-[15%] m-auto w-[75%] sm:w-[50%] md:w-[30%] bg-gray-700 rounded-lg shadow-2xl space-y-2">
       <!--content-->
       <div class="flex justify-between items-center">
         <p class="text-white text-2xl font-semibold">Enter a name to play</p>
-        <i class="gg-close text-white" @click="close"></i>
+        <div class="hover:bg-slate-500/80 rounded-md p-1">
+          <i class="gg-close text-white" @click="close"></i>
+        </div>
       </div>
       <hr class="opacity-20">
       <div class="w-5/6 ml-auto mr-auto">

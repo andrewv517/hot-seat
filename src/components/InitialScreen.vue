@@ -14,7 +14,7 @@
     <p class="text-2xl text-amber-50 font-semibold">Or Create Your Own!</p>
     <button
         @click="createGame"
-        class="w-fit m-auto pl-4 pr-4 pt-2 pb-2 rounded-xl text-white drop-shadow-xl bg-cyan-500"
+        class="w-fit m-auto pl-4 pr-4 pt-2 pb-2 rounded-xl text-white drop-shadow-xl bg-cyan-600"
     >
       Create
     </button>
