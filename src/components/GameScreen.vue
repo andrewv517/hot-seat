@@ -42,13 +42,17 @@
               As a reminder, points are awarded based on your role in the game:
             </p>
             <p class="text-lg text-gray-300 font-semibold">Player in the Hot Seat
-              <span v-if="gameState.players[SocketioService.uuid].number === gameState.playerInHotSeat">(this is you)</span>:</p>
+              <span
+                  v-if="gameState.players[SocketioService.uuid].number === gameState.playerInHotSeat">(this is you)</span>:
+            </p>
             <ul>
               <li class="text-gray-400 text-md">1 point for each player that correctly guesses the answer you wrote.
               </li>
             </ul>
             <p class="text-gray-300 font-semibold text-lg">All Other Players
-              <span v-if="gameState.players[SocketioService.uuid].number !== gameState.playerInHotSeat">(this is you)</span>:</p>
+              <span
+                  v-if="gameState.players[SocketioService.uuid].number !== gameState.playerInHotSeat">(this is you)</span>:
+            </p>
             <ul class="text-gray-400 text-md ">
               <li>1 point for each player that guesses your answer.</li>
               <li>2 points for guessing the player in the Hot Seat's answer correctly</li>
@@ -82,7 +86,9 @@
             </div>
           </div>
         </div>
-        <div v-else class="mt-3 space-y-3 flex flex-col justify-center">
+
+        <!--Everyone submitted, now going over responses-->
+        <div v-else-if="gameState.readingCards" class="mt-3 space-y-3 flex flex-col justify-center">
           <p class="font-semibold text-2xl text-amber-50 text-center">Responses:</p>
           <p
               class="text-md text-gray-400 text-center"
@@ -117,7 +123,8 @@
               <i class="gg-arrow-right text-amber-50"></i>
             </button>
           </div>
-          <p class="font-semibold text-md text-slate-400 text-center">{{gameState.responseIndex + 1}} / {{Object.values(gameState.players).length}}</p>
+          <p class="font-semibold text-md text-slate-400 text-center">{{ gameState.responseIndex + 1 }} /
+            {{ Object.values(gameState.players).length }}</p>
 
           <p
               class="font-semibold text-md text-slate-400 text-center"
@@ -128,12 +135,29 @@
           <button
               class="bg-cyan-500 m-auto p-2 pl-3 pr-3 h-fit text-white font-semibold rounded-lg drop-shadow-xl"
               v-if="gameState.players[SocketioService.uuid].number === gameState.playerInHotSeat"
+              @click="doneReading"
           >
             Done
           </button>
 
         </div>
 
+        <!--Done going over responses-->
+        <div v-else class="space-y-4">
+          <p class="font-semibold text-2xl text-slate-400 text-center">
+            All Responses:
+          </p>
+          <div class="grid grid-cols-2 gap-4">
+            <div
+                v-for="player in gameState.players"
+                :key="player"
+                class="bg-slate-400 font-semibold rounded-lg p-2 drop-shadow-xl text-slate-800"
+            >
+              {{ player.response }}
+            </div>
+          </div>
+
+        </div>
 
       </div>
     </div>
@@ -158,7 +182,7 @@ const waitingForCard = ref(true);
 const response = ref('');
 const submitted = ref(false);
 const showModal = ref(false);
-const gameState = ref<GameState>({players: {}, playerInHotSeat: 1, responseIndex: 0});
+const gameState = ref<GameState>({players: {}, playerInHotSeat: 1, responseIndex: 0, readingCards: true});
 
 interface PlayerData {
   name: string,
@@ -170,6 +194,7 @@ interface GameState {
   players: { [id: string]: PlayerData },
   playerInHotSeat: number,
   responseIndex: number,
+  readingCards: boolean,
 }
 
 SocketioService.socket.on('update', (state: GameState) => {
@@ -185,8 +210,12 @@ SocketioService.socket.on('cardChosen', () => {
   waitingForCard.value = false;
 })
 
-const changeResponse = (newIndex:number) => {
+const changeResponse = (newIndex: number) => {
   SocketioService.socket.emit('changeResponseIndex', newIndex);
+}
+
+const doneReading = () => {
+  SocketioService.socket.emit('doneReading');
 }
 
 const hideModal = () => {

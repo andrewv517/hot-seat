@@ -45,8 +45,10 @@ interface PlayerData {
 }
 
 interface GameState {
-  players: {[id: string]: PlayerData},
+  players: { [id: string]: PlayerData },
   playerInHotSeat: number,
+  responseIndex: number,
+  readingCards: boolean,
 }
 
 const leaveGame = () => {

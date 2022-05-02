@@ -6,7 +6,7 @@ class SocketioService {
     uuid: string;
     constructor() {
         this.uuid = uuidv4();
-        this.socket = io('http://192.168.1.3:3000/');
+        this.socket = io('http://10.72.22.88:3000/');
         this.socket.emit('create', this.uuid);
     }
 

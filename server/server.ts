@@ -7,6 +7,7 @@ interface GameState {
     players: { [id: string]: PlayerData },
     playerInHotSeat: number,
     responseIndex: number,
+    readingCards: boolean,
 }
 
 interface ServerToClientEvents {
@@ -32,7 +33,7 @@ const idToRoom: { [clientId: string]: string } = {};
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {
     cors: {
-        origin: ["http://localhost:8080", "http://192.168.1.3:8080"],
+        origin: ["http://localhost:8080", "http://10.72.22.88:8080"],
     }
 });
 
@@ -83,6 +84,7 @@ io.on('connection', (socket: Socket) => {
             players: {},
             playerInHotSeat: 1, // TODO: increment on a socket thingy
             responseIndex: 0,
+            readingCards: true,
         };
         rooms[roomName].players[socket.data.uuid] = {
             name: nickname,
@@ -175,6 +177,15 @@ io.on('connection', (socket: Socket) => {
         } else {
             rooms[room].responseIndex = newIndex;
         }
+        io.sockets.in(room).emit('update', rooms[room]);
+    })
+
+    socket.on('doneReading', () => {
+        if (!socket.data.uuid) return;
+        const room = idToRoom[socket.data.uuid];
+        if (!room) return;
+
+        rooms[room].readingCards = false;
         io.sockets.in(room).emit('update', rooms[room]);
     })
 
