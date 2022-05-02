@@ -3,18 +3,36 @@ import {createServer} from "http";
 
 const httpServer = createServer();
 
-interface GameData {
-    players: { [clientId: string]: PlayerData },
+interface GameState {
+    players: { [id: string]: PlayerData },
     playerInHotSeat: number,
-    // ...
+    responseIndex: number,
 }
 
-const rooms: { [gameId: string]: GameData } = {};
+interface ServerToClientEvents {
+    update: (state: GameState) => void;
+    startGame: () => void;
+    cardChosen: () => void;
+}
+
+interface ClientToServerEvents {
+    tmp: () => void;
+}
+
+interface InterServerEvents {
+    connect_error: (err: string) => void;
+}
+
+interface SocketData {
+    uuid: string,
+}
+
+const rooms: { [gameId: string]: GameState } = {};
 const idToRoom: { [clientId: string]: string } = {};
 
-const io = new Server(httpServer, {
+const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {
     cors: {
-        origin: ["http://localhost:8080", "http://192.168.1.9:8080"],
+        origin: ["http://localhost:8080", "http://192.168.1.3:8080"],
     }
 });
 
@@ -28,12 +46,23 @@ io.on('connect_error', err => {
     console.log(`connect error due to ${err}`);
 })
 
+
 // connection event
 io.on('connection', (socket: Socket) => {
-    socket.emit('init', {data: 'Hello World!'})
-    console.log('received connected');
+
+    // until this is created, ignore everything else
+    socket.on('create', (uuid: string) => {
+        console.log(`received connection from ${uuid}`)
+        socket.data.uuid = uuid;
+        if (idToRoom[socket.data.uuid]) {
+            socket.join(idToRoom[socket.data.uuid]); // TODO: same player number
+        }
+    })
 
     socket.on('newGame', (nickname) => {
+
+        if (!socket.data.uuid) return;
+
         // generate room id
         let roomName = "";
 
@@ -53,13 +82,14 @@ io.on('connection', (socket: Socket) => {
         rooms[roomName] = {
             players: {},
             playerInHotSeat: 1, // TODO: increment on a socket thingy
+            responseIndex: 0,
         };
-        rooms[roomName].players[socket.id] = {
+        rooms[roomName].players[socket.data.uuid] = {
             name: nickname,
             number: 1,
             response: null,
         };
-        idToRoom[socket.id] = roomName;
+        idToRoom[socket.data.uuid] = roomName;
         socket.join(roomName);
         socket.data.number = 1;
         socket.emit('roomName', roomName, nickname);
@@ -68,19 +98,21 @@ io.on('connection', (socket: Socket) => {
     });
 
     socket.on('joinGame', (code, nickname) => {
+        if (!socket.data.uuid) return;
+
         const room = io.sockets.adapter.rooms.get(code);
         if (!room) {
             console.log(`UNKNOWN CODE: ${code}`);
             socket.emit('unknownGame');
             return;
         }
-        rooms[code].players[socket.id] = {
+        rooms[code].players[socket.data.uuid] = {
             name: nickname,
             number: Object.keys(rooms[code].players).length + 1,
             response: null,
         };
         socket.join(code);
-        idToRoom[socket.id] = code;
+        idToRoom[socket.data.uuid] = code;
         socket.emit('roomName', code, nickname);
 
         // woah
@@ -88,52 +120,77 @@ io.on('connection', (socket: Socket) => {
     })
 
     socket.conn.on('close', reason => {
-        handleLeave(socket);
+        if (!socket.data.uuid) return;
+        console.log('connection closed');
+        console.log(socket.data.uuid);
+        // handleLeave(socket);
     })
 
     socket.on('start', () => {
-        const roomId = idToRoom[socket.id];
+        if (!socket.data.uuid) return;
+        const roomId = idToRoom[socket.data.uuid];
         if (!roomId) return;
         io.sockets.in(roomId).emit('startGame');
     })
 
     socket.on('leave', () => {
+        if (!socket.data.uuid) return;
         handleLeave(socket);
     })
 
+
     socket.on('changeName', name => {
-        const roomsKey = idToRoom[socket.id];
-        rooms[roomsKey].players[socket.id] = name;
+        if (!socket.data.uuid) return;
+        const roomsKey = idToRoom[socket.data.uuid];
+        rooms[roomsKey].players[socket.data.uuid] = name;
         io.sockets.in(roomsKey).emit('update', rooms[roomsKey]);
     })
 
     socket.on('choseCard', () => {
-        const room = idToRoom[socket.id];
+        if (!socket.data.uuid) return;
+        const room = idToRoom[socket.data.uuid];
         if (!room) return;
-        io.sockets.in(room).emit('cardChosen');
+        io.sockets.in(room).emit('cardChosen'); // FIXME: send 'update' instead
     })
 
     socket.on('response', (response: string) => {
-        const room = idToRoom[socket.id];
+        if (!socket.data.uuid) return;
+        const room = idToRoom[socket.data.uuid];
         if (!room) return;
         console.log(response);
-        rooms[room].players[socket.id].response = response;
+        rooms[room].players[socket.data.uuid].response = response;
+        io.sockets.in(room).emit('update', rooms[room]);
+    })
+
+    socket.on('changeResponseIndex', (newIndex: number) => {
+        if (!socket.data.uuid) return;
+        const room = idToRoom[socket.data.uuid];
+        if (!room) return;
+
+        const len = Object.values(rooms[room].players).length;
+        if (newIndex >= len) {
+            rooms[room].responseIndex = 0;
+        } else if (newIndex < 0) {
+            rooms[room].responseIndex = len - 1;
+        } else {
+            rooms[room].responseIndex = newIndex;
+        }
         io.sockets.in(room).emit('update', rooms[room]);
     })
 
 })
 
 const handleLeave = (socket: Socket) => {
-    if (idToRoom[socket.id]) {
-        const roomsKey = idToRoom[socket.id];
+    if (idToRoom[socket.data.uuid]) {
+        const roomsKey = idToRoom[socket.data.uuid];
         const room = io.sockets.adapter.rooms.get(roomsKey);
         if (!room) {
             return;
         }
         socket.leave(roomsKey);
-        const playerNumber = rooms[roomsKey].players[socket.id].number;
-        delete rooms[roomsKey].players[socket.id];
-        delete idToRoom[socket.id];
+        const playerNumber = rooms[roomsKey].players[socket.data.uuid].number;
+        delete rooms[roomsKey].players[socket.data.uuid];
+        delete idToRoom[socket.data.uuid];
         socket.emit('left');
 
         // shift every number down thats greater

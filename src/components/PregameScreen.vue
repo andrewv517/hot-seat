@@ -11,7 +11,7 @@
       <button
           class="p-2 pl-4 pr-4 rounded-xl drop-shadow-lg bg-green-500 text-amber-100"
           @click="startGame"
-          v-if="gameState.players[SocketioService.socket.id]?.number === 1"
+          v-if="gameState.players[SocketioService.uuid]?.number === 1"
       >
         Start Game
       </button>

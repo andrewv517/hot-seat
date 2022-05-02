@@ -1,20 +1,17 @@
 import {io, Socket} from 'socket.io-client';
+import {v4 as uuidv4} from 'uuid';
 
 class SocketioService {
     socket: Socket;
+    uuid: string;
     constructor() {
-        this.socket = io('http://192.168.1.9:3000/');
+        this.uuid = uuidv4();
+        this.socket = io('http://192.168.1.3:3000/', {reconnection: true, reconnectionAttempts: Infinity});
+        this.socket.emit('create', this.uuid);
     }
-    // setupSocketConnection() {
-    //     this.socket = io('http://localhost:3000/');
-    // }
 
     disconnect() {
         this.socket.disconnect();
-    }
-
-    emit(event: string) {
-        this.socket.emit(event);
     }
 
 }

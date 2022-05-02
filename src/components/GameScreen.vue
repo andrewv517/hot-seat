@@ -7,8 +7,8 @@
       <div class="flex justify-center items-center flex-col m-auto grid grid-cols-1 w-5/6 sm:w-2/3 md:w-1/3">
         <!--For the hot seat player-->
         <p class="font-semibold text-2xl text-center text-amber-50"
-           v-if="gameState.players[SocketioService.socket.id].number === gameState.playerInHotSeat">
-          {{ gameState.players[SocketioService.socket.id].name }}, you're in the <span
+           v-if="gameState.players[SocketioService.uuid].number === gameState.playerInHotSeat">
+          {{ gameState.players[SocketioService.uuid].name }}, you're in the <span
             class="text-red-400">hot seat</span>!
         </p>
 
@@ -16,7 +16,7 @@
         <div v-if="waitingForCard">
           <!--Hot Seat Player-->
           <div class="flex justify-center flex-col space-y-5 mt-5"
-               v-if="gameState.players[SocketioService.socket.id].number === gameState.playerInHotSeat">
+               v-if="gameState.players[SocketioService.uuid].number === gameState.playerInHotSeat">
             <p class="font-semibold text-xl text-amber-50 text-center">Choose a card, then click when you're ready</p>
             <button
                 @click="choseCard"
@@ -66,8 +66,8 @@
           </div>
         </div>
 
-        <!--Submitted-->
-        <div v-else class="mt-3">
+        <!--Submitted, but waiting-->
+        <div v-else-if="Object.entries(gameState.players).filter(([, v]) => !v.response).length > 0" class="mt-3">
           <p class="font-semibold text-2xl text-amber-50 text-center">Successfully submitted your response!</p>
           <p class="text-md text-gray-400 text-center">Please wait the following to submit their responses...</p>
           <div class="grid grid-cols-2 gap-4 m-auto mt-3">
@@ -80,6 +80,44 @@
             </div>
           </div>
         </div>
+        <div v-else class="mt-3 space-y-3">
+          <p class="font-semibold text-2xl text-amber-50 text-center">Responses:</p>
+          <p
+              class="text-md text-gray-400 text-center"
+              v-if="gameState.players[SocketioService.uuid].number === gameState.playerInHotSeat"
+          >
+            It's your job to scroll through and read them!
+          </p>
+          <p
+              class="text-md text-gray-400 text-center"
+              v-else
+          >
+            The player in the Hot Seat will scroll through them...
+          </p>
+          <div class="flex justify-between items-center">
+            <button
+                @click="() => changeResponse(gameState.responseIndex - 1)"
+                class="bg-neutral-500 p-2 rounded-full drop-shadow-xl h-fit"
+                v-if="gameState.players[SocketioService.uuid].number === gameState.playerInHotSeat"
+            >
+              <i class="gg-arrow-left text-amber-50"></i>
+            </button>
+            <div
+                class="bg-slate-400 font-semibold rounded-lg p-2 drop-shadow-xl text-slate-800 text-center w-2/3 m-auto"
+            >
+              {{ Object.values(gameState.players)[gameState.responseIndex].response }}
+            </div>
+            <button
+                @click="() => changeResponse(gameState.responseIndex + 1)"
+                class="bg-neutral-500 p-2 rounded-full drop-shadow-xl h-fit"
+                v-if="gameState.players[SocketioService.uuid].number === gameState.playerInHotSeat"
+            >
+              <i class="gg-arrow-right text-amber-50"></i>
+            </button>
+          </div>
+          <p class="font-semibold text-md text-slate-400 text-center">{{gameState.responseIndex + 1}} / {{Object.values(gameState.players).length}}</p>
+        </div>
+
 
       </div>
     </div>
@@ -104,7 +142,7 @@ const waitingForCard = ref(true);
 const response = ref('');
 const submitted = ref(false);
 const showModal = ref(false);
-const gameState = ref<GameState>({players: {}, playerInHotSeat: 1});
+const gameState = ref<GameState>({players: {}, playerInHotSeat: 1, responseIndex: 0});
 
 interface PlayerData {
   name: string,
@@ -115,6 +153,7 @@ interface PlayerData {
 interface GameState {
   players: { [id: string]: PlayerData },
   playerInHotSeat: number,
+  responseIndex: number,
 }
 
 SocketioService.socket.on('update', (state: GameState) => {
@@ -129,6 +168,10 @@ SocketioService.socket.on('startGame', () => {
 SocketioService.socket.on('cardChosen', () => {
   waitingForCard.value = false;
 })
+
+const changeResponse = (newIndex:number) => {
+  SocketioService.socket.emit('changeResponseIndex', newIndex);
+}
 
 const hideModal = () => {
   showModal.value = false;
