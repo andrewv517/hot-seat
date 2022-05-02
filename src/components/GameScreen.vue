@@ -41,12 +41,14 @@
             <p class="text-md text-gray-400">
               As a reminder, points are awarded based on your role in the game:
             </p>
-            <p class="text-lg text-gray-300 font-semibold">Player in the Hot Seat:</p>
+            <p class="text-lg text-gray-300 font-semibold">Player in the Hot Seat
+              <span v-if="gameState.players[SocketioService.uuid].number === gameState.playerInHotSeat">(this is you)</span>:</p>
             <ul>
               <li class="text-gray-400 text-md">1 point for each player that correctly guesses the answer you wrote.
               </li>
             </ul>
-            <p class="text-gray-300 font-semibold text-lg">All Other Players (this is you):</p>
+            <p class="text-gray-300 font-semibold text-lg">All Other Players
+              <span v-if="gameState.players[SocketioService.uuid].number !== gameState.playerInHotSeat">(this is you)</span>:</p>
             <ul class="text-gray-400 text-md ">
               <li>1 point for each player that guesses your answer.</li>
               <li>2 points for guessing the player in the Hot Seat's answer correctly</li>
@@ -54,7 +56,7 @@
             </ul>
           </div>
           <p class="text-gray-300 text-lg font-semibold">Submit your response here.</p>
-          <div class="space-x-5 text-center">
+          <div class="space-x-5 text-center space-y-3">
             <input
                 class="input w-2/3 text-lg sm:text-md max-w-sm focus:ring-blue-500 focus:border-blue-500 rounded-xl p-2 text-white bg-gray-500"
                 placeholder="Enter your response..."
@@ -80,7 +82,7 @@
             </div>
           </div>
         </div>
-        <div v-else class="mt-3 space-y-3">
+        <div v-else class="mt-3 space-y-3 flex flex-col justify-center">
           <p class="font-semibold text-2xl text-amber-50 text-center">Responses:</p>
           <p
               class="text-md text-gray-400 text-center"
@@ -116,6 +118,20 @@
             </button>
           </div>
           <p class="font-semibold text-md text-slate-400 text-center">{{gameState.responseIndex + 1}} / {{Object.values(gameState.players).length}}</p>
+
+          <p
+              class="font-semibold text-md text-slate-400 text-center"
+              v-if="gameState.players[SocketioService.uuid].number === gameState.playerInHotSeat"
+          >
+            Once you're done, click below.
+          </p>
+          <button
+              class="bg-cyan-500 m-auto p-2 pl-3 pr-3 h-fit text-white font-semibold rounded-lg drop-shadow-xl"
+              v-if="gameState.players[SocketioService.uuid].number === gameState.playerInHotSeat"
+          >
+            Done
+          </button>
+
         </div>
 
 
