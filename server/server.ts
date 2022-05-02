@@ -10,10 +10,18 @@ interface GameState {
     readingCards: boolean,
 }
 
+
+interface PlayerData {
+    name: string,
+    number: number,
+    response: string | null,
+}
+
 interface ServerToClientEvents {
     update: (state: GameState) => void;
     startGame: () => void;
     cardChosen: () => void;
+    random: (data: [string, PlayerData][]) => void;
 }
 
 interface ClientToServerEvents {
@@ -36,12 +44,6 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
         origin: ["http://localhost:8080", "http://10.72.22.88:8080"],
     }
 });
-
-interface PlayerData {
-    name: string,
-    number: number,
-    response: string | null,
-}
 
 io.on('connect_error', err => {
     console.log(`connect error due to ${err}`);
@@ -140,7 +142,6 @@ io.on('connection', (socket: Socket) => {
         handleLeave(socket);
     })
 
-
     socket.on('changeName', name => {
         if (!socket.data.uuid) return;
         const roomsKey = idToRoom[socket.data.uuid];
@@ -161,6 +162,7 @@ io.on('connection', (socket: Socket) => {
         if (!room) return;
         console.log(response);
         rooms[room].players[socket.data.uuid].response = response;
+
         io.sockets.in(room).emit('update', rooms[room]);
     })
 
@@ -187,6 +189,14 @@ io.on('connection', (socket: Socket) => {
 
         rooms[room].readingCards = false;
         io.sockets.in(room).emit('update', rooms[room]);
+    })
+
+    socket.on('randomize', () => {
+        if (!socket.data.uuid) return;
+        const room = idToRoom[socket.data.uuid];
+        if (!room) return;
+        const randomizedEntries = Object.entries(rooms[room].players).sort(() => 0.5 - Math.random());
+        io.sockets.in(room).emit('random', randomizedEntries);
     })
 
 })
