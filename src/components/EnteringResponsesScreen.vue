@@ -59,17 +59,4 @@ const submitResponse = () => {
 
 </script>
 <style scoped>
-tr:nth-child(odd) {
-  @apply border border-slate-400 bg-slate-500;
-}
-
-table {
-  counter-reset: rowNumber;
-}
-
-table tr::before {
-  display: table-cell;
-  counter-increment: rowNumber;
-  content: counter(rowNumber) ".";
-}
 </style>
