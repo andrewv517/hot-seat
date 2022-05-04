@@ -32,24 +32,13 @@
 <script setup lang="ts">
 import {defineProps, defineEmits} from "vue";
 import SocketioService from "@/socketio.service";
+import {GameState} from "@/interfaces";
 const props = defineProps<{
   gameState: GameState,
   gameId: string,
 }>()
 
 const emit = defineEmits(['start']);
-
-interface PlayerData {
-  name: string,
-  number: number,
-}
-
-interface GameState {
-  players: { [id: string]: PlayerData },
-  playerInHotSeat: number,
-  responseIndex: number,
-  readingCards: boolean,
-}
 
 const leaveGame = () => {
   console.log('attempting to leave');

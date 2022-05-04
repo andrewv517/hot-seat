@@ -17,12 +17,7 @@
 </template>
 <script setup lang="ts">
 import {defineProps} from "vue";
-
-interface PlayerData {
-  name: string,
-  number: number,
-  response: string,
-}
+import {PlayerData} from "@/interfaces";
 
 defineProps<{
   randomizedArray: [[string, PlayerData]] | undefined,

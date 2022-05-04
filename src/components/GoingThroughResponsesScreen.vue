@@ -56,19 +56,7 @@
 <script setup lang="ts">
 import {defineProps} from "vue";
 import SocketioService from "@/socketio.service";
-
-interface PlayerData {
-  name: string,
-  number: number,
-  response: string,
-}
-
-interface GameState {
-  players: { [id: string]: PlayerData },
-  playerInHotSeat: number,
-  responseIndex: number,
-  readingCards: boolean,
-}
+import {GameState, PlayerData} from "@/interfaces";
 
 defineProps<{
   isInHotSeat: boolean,

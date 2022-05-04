@@ -22,19 +22,7 @@
 </template>
 <script setup lang="ts">
 import {defineProps, defineEmits} from "vue";
-
-interface PlayerData {
-  name: string,
-  number: number,
-  response: string,
-}
-
-interface GameState {
-  players: { [id: string]: PlayerData },
-  playerInHotSeat: number,
-  responseIndex: number,
-  readingCards: boolean,
-}
+import {GameState, PlayerData} from "@/interfaces";
 
 const props = defineProps<{
   isInHotSeat: boolean,

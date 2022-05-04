@@ -68,6 +68,7 @@ import EnteringResponsesScreen from "@/components/EnteringResponsesScreen.vue";
 import WaitingForResponsesScreen from "@/components/WaitingForResponsesScreen.vue";
 import GoingThroughResponsesScreen from "@/components/GoingThroughResponsesScreen.vue";
 import AllResponsesScreen from "@/components/AllResponsesScreen.vue";
+import {GameState, PlayerData} from "@/interfaces";
 
 defineProps({
   gameid: String,
@@ -85,19 +86,6 @@ const peopleWhoHaventSubmitted = computed(() => Object.fromEntries(Object.entrie
 const everybodyDone = ref(false);
 const randomizedArray = ref<[[string, PlayerData]] | undefined>();
 let randomized = false;
-
-interface PlayerData {
-  name: string,
-  number: number,
-  response: string,
-}
-
-interface GameState {
-  players: { [id: string]: PlayerData },
-  playerInHotSeat: number,
-  responseIndex: number,
-  readingCards: boolean,
-}
 
 SocketioService.socket.on('update', (state: GameState) => {
   gameState.value = state;
@@ -144,12 +132,6 @@ const startGame = () => {
 const submit = () => {
   submitted.value = true;
 }
-
-// const leaveGame = () => {
-//   console.log('attempting to leave');
-//   SocketioService.socket.emit('leave');
-// }
-
 
 </script>
 
