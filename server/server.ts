@@ -15,6 +15,7 @@ interface PlayerData {
     name: string,
     number: number,
     response: string | null,
+    vote: PlayerData | null,
 }
 
 interface ServerToClientEvents {
@@ -92,6 +93,7 @@ io.on('connection', (socket: Socket) => {
             name: nickname,
             number: 1,
             response: null,
+            vote: null,
         };
         idToRoom[socket.data.uuid] = roomName;
         socket.join(roomName);
@@ -114,6 +116,7 @@ io.on('connection', (socket: Socket) => {
             name: nickname,
             number: Object.keys(rooms[code].players).length + 1,
             response: null,
+            vote: null,
         };
         socket.join(code);
         idToRoom[socket.data.uuid] = code;
@@ -123,7 +126,7 @@ io.on('connection', (socket: Socket) => {
         io.sockets.in(code).emit('update', rooms[code]);
     })
 
-    socket.conn.on('close', reason => {
+    socket.conn.on('close', () => {
         if (!socket.data.uuid) return;
         console.log('connection closed');
         console.log(socket.data.uuid);
@@ -197,6 +200,14 @@ io.on('connection', (socket: Socket) => {
         if (!room) return;
         const randomizedEntries = Object.entries(rooms[room].players).sort(() => 0.5 - Math.random());
         io.sockets.in(room).emit('random', randomizedEntries);
+    })
+
+    socket.on('vote', (player: PlayerData) => {
+        if (!socket.data.uuid) return;
+        const room = idToRoom[socket.data.uuid];
+        if (!room) return;
+        rooms[room].players[socket.data.uuid].vote = player;
+        io.sockets.in(room).emit('update', rooms[room]);
     })
 
 })
