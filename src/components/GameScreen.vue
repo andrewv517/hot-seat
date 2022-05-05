@@ -49,6 +49,7 @@
         <AllResponsesScreen
             v-else
             :randomizedArray="randomizedArray"
+            :gameState="gameState"
         />
 
       </div>
