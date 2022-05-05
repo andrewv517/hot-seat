@@ -2,6 +2,7 @@ export interface PlayerData {
     name: string,
     number: number,
     response: string,
+    vote: PlayerData,
 }
 
 export interface GameState {
