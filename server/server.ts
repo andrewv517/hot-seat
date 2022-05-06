@@ -3,11 +3,13 @@ import {createServer} from "http";
 
 const httpServer = createServer();
 
-interface GameState {
+export interface GameState {
     players: { [id: string]: PlayerData },
     playerInHotSeat: number,
     responseIndex: number,
     readingCards: boolean,
+    countdownGoing: boolean,
+    countdownFinished: boolean,
 }
 
 
@@ -18,29 +20,10 @@ interface PlayerData {
     vote: PlayerData | null,
 }
 
-interface ServerToClientEvents {
-    update: (state: GameState) => void;
-    startGame: () => void;
-    cardChosen: () => void;
-    random: (data: [string, PlayerData][]) => void;
-}
-
-interface ClientToServerEvents {
-    tmp: () => void;
-}
-
-interface InterServerEvents {
-    connect_error: (err: string) => void;
-}
-
-interface SocketData {
-    uuid: string,
-}
-
 const rooms: { [gameId: string]: GameState } = {};
 const idToRoom: { [clientId: string]: string } = {};
 
-const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {
+const io = new Server(httpServer, {
     cors: {
         origin: ["http://localhost:8080", "http://10.72.22.88:8080"],
     }
@@ -88,6 +71,8 @@ io.on('connection', (socket: Socket) => {
             playerInHotSeat: 1, // TODO: increment on a socket thingy
             responseIndex: 0,
             readingCards: true,
+            countdownGoing: false,
+            countdownFinished: false,
         };
         rooms[roomName].players[socket.data.uuid] = {
             name: nickname,
@@ -210,7 +195,30 @@ io.on('connection', (socket: Socket) => {
         io.sockets.in(room).emit('update', rooms[room]);
     })
 
+    socket.on('countdown', () => {
+        if (!socket.data.uuid) return;
+        const room = idToRoom[socket.data.uuid];
+        if (!room) return;
+        if (rooms[room].countdownGoing) return;
+        rooms[room].countdownGoing = true;
+        io.sockets.in(room).emit('update', rooms[room]);
+        io.sockets.in(room).emit('startCountdown');
+    })
+
+    socket.on('countdownOver', () => {
+        if (!socket.data.uuid) return;
+        const room = idToRoom[socket.data.uuid];
+        if (!room) return;
+        if (!rooms[room].countdownGoing) return;
+        if (rooms[room].countdownFinished) return;
+        rooms[room].countdownGoing = false;
+        rooms[room].countdownFinished = true;
+        io.sockets.in(room).emit('update', rooms[room]);
+        io.sockets.in(room).emit('endCountdown');
+    })
+
 })
+
 
 const handleLeave = (socket: Socket) => {
     if (idToRoom[socket.data.uuid]) {

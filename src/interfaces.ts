@@ -10,4 +10,6 @@ export interface GameState {
     playerInHotSeat: number,
     responseIndex: number,
     readingCards: boolean,
+    countdownGoing: boolean,
+    countdownFinished: boolean,
 }

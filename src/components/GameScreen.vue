@@ -80,7 +80,7 @@ const gameReady = ref(false);
 const waitingForCard = ref(true);
 const submitted = ref(false);
 const modalViewable = ref(false);
-const gameState = ref<GameState>({players: {}, playerInHotSeat: 1, responseIndex: 0, readingCards: true});
+const gameState = ref<GameState>({players: {}, playerInHotSeat: 1, responseIndex: 0, readingCards: true, countdownGoing: false, countdownFinished: false});
 const isInHotSeat = computed(() => gameState.value.players[SocketioService.uuid].number === gameState.value.playerInHotSeat);
 const waitingForSubmissions = computed(() => Object.entries(gameState.value.players).filter(([, v]) => !v.response).length > 0);
 const peopleWhoHaventSubmitted = computed(() => Object.fromEntries(Object.entries(gameState.value.players).filter(([, v]) => !v.response)));
@@ -95,6 +95,11 @@ SocketioService.socket.on('update', (state: GameState) => {
     // randomize the players
     SocketioService.socket.emit('randomize');
     randomized = true;
+  }
+
+  // voting
+  if (everybodyDone.value && !gameState.value.readingCards && !gameState.value.countdownFinished) {
+    SocketioService.socket.emit('countdown');
   }
 
   console.log(state);
