@@ -1,13 +1,10 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
 
 export default function Home() {
   return (
     <>
     <header className="flex justify-center items-center space-x-2 mt-6">
-    <Image src="/cards.png" alt="cards.png" className="w-20" width={80} height={80} />
     <h1 className="text-6xl text-amber-50 font-semibold">Hot Seat</h1>
   </header>
     <div className="grid grid-cols-1 w-5/6 sm:w-2/3 md:w-1/3 m-auto space-y-5 mt-10 text-center">
