@@ -4,8 +4,6 @@ import Image from "next/image";
 import { useState } from "react";
 
 export default function Home() {
-  const [gameCode, setGameCode] = useState('');
-
   return (
     <>
     <header className="flex justify-center items-center space-x-2 mt-6">
@@ -18,7 +16,6 @@ export default function Home() {
       <input
              className="w-2/3 focus:ring-blue-500 focus:border-blue-500 rounded-xl p-2 pl-4 text-white bg-gray-500 block outline-none"
              placeholder="Enter Game Code..."
-             onChange={(e) => setGameCode(e.target.value)}
              id="gameIdInput" />
       <button className="inline-block w-fit m-auto pl-4 pr-4 pt-2 pb-2 rounded-xl text-white drop-shadow-xl bg-green-600">
         Join
