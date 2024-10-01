@@ -31,7 +31,7 @@ export default function Home() {
         setGames(gameInfo);
       })
     }
-  }, [connected])
+  }, [connected, on])
 
   const handleCreateGame = (name: string) => {
     emit('createGame', { name })

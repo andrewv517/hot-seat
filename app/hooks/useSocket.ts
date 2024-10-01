@@ -38,7 +38,7 @@ const useSocket = () => {
   };
 
   // Custom method to listen to events
-  const on = (event: string, callback: any) => {
+  const on = (event: string, callback: (...args: any[]) => void) => {
     if (socketRef.current) {
       socketRef.current.on(event, callback);
     }
