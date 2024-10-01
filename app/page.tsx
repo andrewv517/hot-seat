@@ -17,7 +17,7 @@ export default function Home() {
 
   useEffect(() => {
     const getGames = async () => {
-      const res = await fetch("localhost:8080/games");
+      const res = await fetch("http://localhost:8080/games");
       const json: { games: Game[] } = await res.json();
       setGames(json.games);
     }
@@ -27,7 +27,6 @@ export default function Home() {
   useEffect(() => {
     if (connected) {
       on('gamesInformation', (gameInfo: Game[]) => {
-        console.log(gameInfo);
         setGames(gameInfo);
       })
     }
