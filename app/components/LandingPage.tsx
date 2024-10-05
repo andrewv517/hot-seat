@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react"
-import { API_URL, Game } from "../types"
+import { API_URL, COOKIE_NAME, Game } from "../types"
 import Modal from "./Modal";
 import { socket } from "../socket";
+import { cookies } from "next/headers";
+import { useCookies } from "react-cookie";
 
 export default function LandingPage() {
     const [games, setGames] = useState<Game[]>([])
+    const [cookies, setCookie, removeCookie] = useCookies([COOKIE_NAME]);
     const [showingModal, setShowingModal] = useState(false);
     const [gameId, setGameId] = useState('');
     const [action, setAction] = useState('');
@@ -27,7 +30,7 @@ export default function LandingPage() {
             setGameId(gameName);
         }
 
-        const priorName = localStorage.getItem("name");
+        const priorName = cookies["hot-seat-cookie"];
         if (priorName) {
             hideModal(priorName);
         } else {
@@ -56,7 +59,7 @@ export default function LandingPage() {
     const handleCreateGame = (name: string) => {
         socket.emit('createGame', { name })
         setShowingModal(false);
-        localStorage.setItem("name", name);
+        setCookie(COOKIE_NAME, name);
     }
 
     return (

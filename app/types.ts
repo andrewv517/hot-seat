@@ -22,3 +22,4 @@ export interface Game {
 }
 
 export const API_URL = 'https://hotseatapi.andrewvadeika.com'
+export const COOKIE_NAME = 'hot-seat-cookie';

@@ -3,18 +3,20 @@
 import { useEffect, useState } from "react";
 import Modal from "./components/Modal";
 import LandingPage from "./components/LandingPage";
-import { API_URL, Game, PlayerData } from "./types";
+import { API_URL, COOKIE_NAME, Game, PlayerData } from "./types";
 import GameScreen from "./components/GameScreen";
 import { socket } from "./socket";
+import { useCookies } from "react-cookie";
 
 
 export default function Home() {
   const [game, setGame] = useState<Game | undefined>();
   const [player, setPlayer] = useState<PlayerData | undefined>()
+  const [cookies, setCookie, removeCookie] = useCookies([COOKIE_NAME]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const oldName = localStorage.getItem("name");
+    const oldName = cookies["hot-seat-cookie"];
     if (oldName) {
       socket.emit('identity', { name: oldName })
     } else {
@@ -36,7 +38,7 @@ export default function Home() {
         }
       } else {
         // remove local storage (outdated name)
-        localStorage.removeItem("name");
+        removeCookie(COOKIE_NAME)
       }
       setLoading(false);
     })
