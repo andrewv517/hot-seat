@@ -16,35 +16,27 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const oldName = cookies["hot-seat-cookie"];
-    console.log({ name: oldName });
-    if (oldName) {
-      socket.emit('identity', { name: oldName })
-    } else {
-      setLoading(false);
-    }
-  }, [cookies])
-
-  useEffect(() => {
     socket.on('player', (playerData: PlayerData) => {
       setPlayer(playerData);
     })
 
-    socket.on('identityFound', async (playerData: PlayerData | null) => {
-      if (playerData) {
-        // get game state (if possible)
-        setPlayer(playerData);
-        const res = await fetch(`${API_URL}/game?socketId=${playerData.socketId}`);
-        const json: { game?: Game } = await res.json();
-        if (json.game) {
+    const returnToGame = async () => {
+      const oldName = cookies["hot-seat-cookie"];
+      console.log({ name: oldName });
+      if (oldName) {
+        const res = await fetch(`${API_URL}/game?name=${oldName}`);
+        const json: { game: Game | undefined, player: PlayerData | null } = await res.json();
+        if (json.game && json.player) {
           setGame(json.game);
+          setPlayer(json.player);
+        } else {
+          removeCookie(COOKIE_NAME);
         }
       } else {
-        // remove local storage (outdated name)
-        removeCookie(COOKIE_NAME)
+        removeCookie(COOKIE_NAME);
       }
       setLoading(false);
-    })
+    }
 
     socket.on('gameState', ({ game }: { game: Game | undefined }) => {
       setGame(game);
@@ -53,6 +45,8 @@ export default function Home() {
         setPlayer(prevPlayer => game.players.find(p => p.name === prevPlayer?.name))
       }
     });
+
+    returnToGame();
   }, []);
 
 

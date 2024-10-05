@@ -36,7 +36,6 @@ export default function GameScreen({ game, player }: { game: Game, player: Playe
                     <button className="absolute bottom-0 right-0 m-3 p-2 pl-4 pr-4 rounded-xl drop-shadow-lg bg-red-500 font-semibold" onClick={() => socket.emit('end', { game })}>Delete</button>
                     : null
             }
-            <p>Cookies: [{cookies["hot-seat-cookie"]}]</p>
             {
                 game.started ?
                     <div className="flex justify-center items-center flex-col mx-auto mt-5 w-5/6 sm:w-2/3 md:w-1/3">
