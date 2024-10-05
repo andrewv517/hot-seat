@@ -11,7 +11,7 @@ export default function LandingPage() {
 
     useEffect(() => {
         const getGames = async () => {
-            const res = await fetch("http://localhost:8080/games");
+            const res = await fetch("http://192.168.1.132:8080/games");
             const json: { games: Game[] } = await res.json();
             setGames(json.games);
         }
