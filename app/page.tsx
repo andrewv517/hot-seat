@@ -22,7 +22,9 @@ export default function Home() {
     } else {
       setLoading(false);
     }
+  }, [cookies])
 
+  useEffect(() => {
     socket.on('player', (playerData: PlayerData) => {
       setPlayer(playerData);
     })
