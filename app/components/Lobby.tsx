@@ -3,7 +3,7 @@ import { Game, PlayerData } from "../types";
 
 export default function Lobby({ game, player }: { game: Game, player: PlayerData }) {
     const handleLeave = () => {
-        socket.emit('leave', { game });
+        socket.emit('leave', { name: player.name, game });
     }
 
     const isHost = (p: PlayerData) => {
