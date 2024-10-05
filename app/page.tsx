@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Modal from "./components/Modal";
 import LandingPage from "./components/LandingPage";
-import { Game, PlayerData } from "./types";
+import { API_URL, Game, PlayerData } from "./types";
 import GameScreen from "./components/GameScreen";
 import { socket } from "./socket";
 
@@ -29,7 +29,7 @@ export default function Home() {
       if (playerData) {
         // get game state (if possible)
         setPlayer(playerData);
-        const res = await fetch(`http://192.168.1.132:8080/game?socketId=${playerData.socketId}`);
+        const res = await fetch(`${API_URL}/game?socketId=${playerData.socketId}`);
         const json: { game?: Game } = await res.json();
         if (json.game) {
           setGame(json.game);

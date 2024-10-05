@@ -20,3 +20,5 @@ export interface Game {
   choseCard: boolean,
   seconds: number,
 }
+
+export const API_URL = 'https://hotseatapi.andrewvadeika.com'

@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+import { API_URL } from "./types";
 
 // Initialize socket connection
-export const socket = io('http://192.168.1.132:8080', { });
+export const socket = io(API_URL, { });

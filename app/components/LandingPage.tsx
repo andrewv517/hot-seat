@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Game } from "../types"
+import { API_URL, Game } from "../types"
 import Modal from "./Modal";
 import { socket } from "../socket";
 
@@ -11,7 +11,7 @@ export default function LandingPage() {
 
     useEffect(() => {
         const getGames = async () => {
-            const res = await fetch("http://192.168.1.132:8080/games");
+            const res = await fetch(`${API_URL}/games`);
             const json: { games: Game[] } = await res.json();
             setGames(json.games);
         }
