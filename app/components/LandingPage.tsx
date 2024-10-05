@@ -63,6 +63,7 @@ export default function LandingPage() {
             {
                 showingModal ? <Modal onClose={(nameValue) => hideModal(nameValue, actionState, gameIdState)} /> : null
             }
+            <p>Cookies: [{cookies["hot-seat-cookie"]}]</p>
             <div className="grid grid-cols-1 w-5/6 sm:w-2/3 m-auto space-y-5 mt-10 text-center">
                 <p className="text-2xl text-amber-50 font-semibold">Join a game...</p>
                 {
