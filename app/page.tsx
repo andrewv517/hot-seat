@@ -29,7 +29,7 @@ export default function Home() {
       if (playerData) {
         // get game state (if possible)
         setPlayer(playerData);
-        const res = await fetch(`http://localhost:8080/game?socketId=${playerData.socketId}`);
+        const res = await fetch(`http://192.168.1.132:8080/game?socketId=${playerData.socketId}`);
         const json: { game?: Game } = await res.json();
         if (json.game) {
           setGame(json.game);
