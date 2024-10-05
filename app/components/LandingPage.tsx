@@ -9,8 +9,8 @@ export default function LandingPage() {
     const [games, setGames] = useState<Game[]>([])
     const [cookies, setCookie, removeCookie] = useCookies([COOKIE_NAME]);
     const [showingModal, setShowingModal] = useState(false);
-    const [gameId, setGameId] = useState('');
-    const [action, setAction] = useState('');
+    const [actionState, setActionState] = useState('');
+    const [gameIdState, setGameIdState] = useState('');
 
     useEffect(() => {
         const getGames = async () => {
@@ -24,26 +24,21 @@ export default function LandingPage() {
         })
     }, [])
 
-    const handleModal = (action: string, gameName?: string) => {
-        setAction(action);
+    const handleModal = (actionParam: string, gameName?: string) => {
         if (gameName) {
-            setGameId(gameName);
+            setGameIdState(gameName);
         }
 
         const priorName = cookies["hot-seat-cookie"];
         if (priorName) {
-            hideModal(priorName);
+            hideModal(priorName, actionParam, gameName);
         } else {
-            showModal(action);
+            setActionState(actionParam);
+            setShowingModal(true)
         }
     }
 
-    const showModal = (actionString: string) => {
-        setAction(actionString);
-        setShowingModal(true);
-    }
-
-    const hideModal = (name: string) => {
+    const hideModal = (name: string, action: string, gameId?: string) => {
         if (action === 'join') {
             if (!gameId) return;
             handleJoinGame(name, gameId);
@@ -54,6 +49,7 @@ export default function LandingPage() {
 
     const handleJoinGame = (name: string, gameName: string) => {
         socket.emit('joinGame', { name, gameName })
+        setCookie(COOKIE_NAME, name);
     }
 
     const handleCreateGame = (name: string) => {
@@ -65,18 +61,18 @@ export default function LandingPage() {
     return (
         <>
             {
-                showingModal ? <Modal onClose={hideModal} /> : null
+                showingModal ? <Modal onClose={(nameValue) => hideModal(nameValue, actionState, gameIdState)} /> : null
             }
             <div className="grid grid-cols-1 w-5/6 sm:w-2/3 m-auto space-y-5 mt-10 text-center">
                 <p className="text-2xl text-amber-50 font-semibold">Join a game...</p>
                 {
                     games.length > 0 ?
-                        <div className="grid grid-cols-2 gap-4">
+                        <div>
                             {
                                 games.map((game, index) => (
                                     <div
                                         key={index}
-                                        className="bg-slate-400 font-semibold rounded-lg p-2 drop-shadow-xl text-slate-800 flex flex-row justify-between items-center"
+                                        className="bg-slate-400 font-semibold rounded-lg p-2 drop-shadow-xl text-slate-800 flex flex-row justify-between items-center my-4"
                                     >
                                         <div className="flex-1 flex justify-start">Host: {game.host.name}</div>
                                         <div>

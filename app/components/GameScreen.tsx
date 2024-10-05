@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { socket } from "../socket";
-import { Game, PlayerData } from "../types";
+import { COOKIE_NAME, Game, PlayerData } from "../types";
 import Lobby from "./Lobby";
 import ChoosingCard from "./ChoosingCard";
 import WaitingForResponses from "./WaitingForResponses";
@@ -8,12 +7,13 @@ import EnteringResponses from "./EnteringResponses";
 import GoingThroughResponses from "./GoingThroughResponses";
 import AllResponses from "./AllResponses";
 import Results from "./Results";
+import { useCookies } from "react-cookie";
 
 export default function GameScreen({ game, player }: { game: Game, player: PlayerData }) {
     const isInHotSeat = () => {
         return player.name === game.playerInHotSeat.name;
     }
-
+    const [cookies, setCookie, removeCookie] = useCookies([COOKIE_NAME]);
     function renderScreen() {
         if (!game.choseCard) {
             return <ChoosingCard game={game} isInHotSeat={isInHotSeat()} />
