@@ -21,10 +21,6 @@ export default function LandingPage() {
         })
     }, [])
 
-    useEffect(() => {
-
-    }, [])
-
     const handleModal = (action: string, gameName?: string) => {
         setAction(action);
         if (gameName) {
