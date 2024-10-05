@@ -27,6 +27,7 @@ export default function Home() {
         const res = await fetch(`${API_URL}/game?name=${oldName}`);
         const json: { game: Game | undefined, player: PlayerData | null } = await res.json();
         if (json.game && json.player) {
+          socket.emit('rejoin', { game: json.game });
           setGame(json.game);
           setPlayer(json.player);
         } else {
