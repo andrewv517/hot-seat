@@ -17,6 +17,7 @@ export default function Home() {
 
   useEffect(() => {
     const oldName = cookies["hot-seat-cookie"];
+    console.log({ name: oldName });
     if (oldName) {
       socket.emit('identity', { name: oldName })
     } else {
