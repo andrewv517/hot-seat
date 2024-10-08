@@ -5,7 +5,7 @@ export default function Results({ game, isInHotSeat }: { game: Game, isInHotSeat
     return (
         <div className="space-y-4 w-full flex flex-col justify-center items-center">
             <p className="font-semibold text-2xl text-slate-400 text-center">
-                {game.playerInHotSeat.name} wrote <span className="text-green-600">{game.playerInHotSeat.response}</span>
+                {game.playerInHotSeat.name} wrote <span className="text-green-600">{game.players.find(({name}) => name === game.playerInHotSeat.name)?.response}</span>
             </p>
             <p className="font-semibold text-2xl text-slate-300 text-center underline">
                 Leaderboard
