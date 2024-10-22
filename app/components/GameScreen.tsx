@@ -1,5 +1,5 @@
-import { socket } from "../socket";
-import { COOKIE_NAME, Game, PlayerData } from "../types";
+import { headers, socket } from "../socket";
+import { API_URL, COOKIE_NAME, Game, PlayerData } from "../types";
 import Lobby from "./Lobby";
 import ChoosingCard from "./ChoosingCard";
 import WaitingForResponses from "./WaitingForResponses";
@@ -29,11 +29,22 @@ export default function GameScreen({ game, player }: { game: Game, player: Playe
         return <Results game={game} isInHotSeat={isInHotSeat()} />
     }
 
+    function handleEnd() {
+        fetch(`${API_URL}/end`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+                socketId: socket.id,
+                gameName: game.id,
+            })
+        })
+    }
+
     return (
         <div>
             {
                 game.host.name === player.name ?
-                    <button className="absolute bottom-0 right-0 m-3 p-2 pl-4 pr-4 rounded-xl drop-shadow-lg bg-red-500 font-semibold" onClick={() => socket.emit('end', { game })}>Delete</button>
+                    <button className="absolute bottom-0 right-0 m-3 p-2 pl-4 pr-4 rounded-xl drop-shadow-lg bg-red-500 font-semibold" onClick={handleEnd}>Delete</button>
                     : null
             }
             {

@@ -1,8 +1,31 @@
-import { socket } from "../socket";
-import { Game, PlayerData } from "../types";
+import { headers, socket } from "../socket";
+import { API_URL, Game, PlayerData } from "../types";
 
 export default function GoingThroughResponses({ isInHotSeat, game }: { isInHotSeat: boolean, game: Game }) {
-    console.log(game);
+
+    function handleChangeResponse(index: number) {
+        fetch(`${API_URL}/changeResponseIndex`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+                socketId: socket.id,
+                gameName: game.id,
+                index,
+            })
+        })
+    }
+
+    function handleDoneReading() {
+        fetch(`${API_URL}/doneReading`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+                socketId: socket.id,
+                gameName: game.id,
+            })
+        })
+    }
+
     return (
         <div className="mt-3 space-y-3 flex flex-col justify-center">
             <p className="font-semibold text-2xl text-amber-50 text-center">Responses:</p>
@@ -25,7 +48,7 @@ export default function GoingThroughResponses({ isInHotSeat, game }: { isInHotSe
                     isInHotSeat ?
                         <button
                             className="bg-neutral-500 p-2 rounded-full drop-shadow-xl h-fit"
-                            onClick={() => socket.emit('changeResponseIndex', { index: game.responseIndex - 1, game })}
+                            onClick={() => handleChangeResponse(game.responseIndex - 1)}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18" />
@@ -42,7 +65,7 @@ export default function GoingThroughResponses({ isInHotSeat, game }: { isInHotSe
                     isInHotSeat ?
                         <button
                             className="bg-neutral-500 p-2 rounded-full drop-shadow-xl h-fit"
-                            onClick={() => socket.emit('changeResponseIndex', { index: game.responseIndex + 1, game })}
+                            onClick={() => handleChangeResponse(game.responseIndex + 1)}
                         >
 
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -63,7 +86,7 @@ export default function GoingThroughResponses({ isInHotSeat, game }: { isInHotSe
                         </p>
                         <button
                             className="bg-cyan-500 m-auto p-2 pl-3 pr-3 h-fit text-white font-semibold rounded-lg drop-shadow-xl"
-                            onClick={() => socket.emit('doneReading', { game })}
+                            onClick={handleDoneReading}
                         >
                             I am done reading
                         </button >

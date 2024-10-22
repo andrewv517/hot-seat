@@ -1,7 +1,19 @@
-import { socket } from "../socket";
-import { Game } from "../types";
+import { headers, socket } from "../socket";
+import { API_URL, Game } from "../types";
 
 export default function Results({ game, isInHotSeat }: { game: Game, isInHotSeat: boolean }) {
+
+    function handleNextRound() {
+        fetch(`${API_URL}/nextRound`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+                socketId: socket.id,
+                gameName: game.id,
+            })
+        })
+    }
+
     return (
         <div className="space-y-4 w-full flex flex-col justify-center items-center">
             <p className="font-semibold text-2xl text-slate-400 text-center">
@@ -16,7 +28,7 @@ export default function Results({ game, isInHotSeat }: { game: Game, isInHotSeat
                     [...game.players]
                         .sort((a, b) => b.points - a.points)
                         .map((p, index) => (
-                            <div className="bg-slate-400 font-semibold rounded-lg p-2 drop-shadow-xl text-slate-800 flex flex-row justify-between items-center">
+                            <div key={index} className="bg-slate-400 font-semibold rounded-lg p-2 drop-shadow-xl text-slate-800 flex flex-row justify-between items-center">
                                 <span className="w-1/6">{index + 1}.</span>
                                 <span className="w-1/2 text-left">
                                     {p.name}
@@ -33,7 +45,7 @@ export default function Results({ game, isInHotSeat }: { game: Game, isInHotSeat
                 isInHotSeat ?
                     <button
                         className="bg-green-500 text-white w-fit font-semibold py-2 px-4 drop-shadow-xl rounded-lg"
-                        onClick={() => socket.emit('nextRound', { game })}
+                        onClick={handleNextRound}
                     >
                         Next round
                     </button> : null

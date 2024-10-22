@@ -1,11 +1,11 @@
-import { socket } from "../socket";
-import { Game, PlayerData } from "../types";
+import { headers, socket } from "../socket";
+import { API_URL, Game, PlayerData } from "../types";
 
 export default function AllResponses({ game, player, isInHotSeat }: { game: Game, player: PlayerData, isInHotSeat: boolean }) {
     const amountOfVotes = (p: PlayerData) => {
         let sum = 0;
         for (let i = 0; i < game.players.length; i++) {
-            if (game.players[i].vote?.name === p.name) {
+            if (game.players[i].vote === p.name) {
                 sum++;
             }
         }
@@ -14,7 +14,16 @@ export default function AllResponses({ game, player, isInHotSeat }: { game: Game
 
     const handleVote = (p: PlayerData) => {
         if (isInHotSeat) return;
-        socket.emit('vote', { player, votingFor: p, game })
+        fetch(`${API_URL}/vote`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+                socketId: socket.id,
+                gameName: game.id,
+                playerName: player.name,
+                votingForPlayerName: p.name,
+            })
+        })
     }
 
     return (
@@ -24,10 +33,11 @@ export default function AllResponses({ game, player, isInHotSeat }: { game: Game
             </p>
             <div className="grid grid-cols-2 gap-4">
                 {
-                    game.randomizedPlayers.map(p => (
+                    game.randomizedPlayers.map((p, index) => (
                         <div
-                            className={`bg-slate-400 font-semibold rounded-lg p-2 drop-shadow-xl text-slate-800 ${player.vote?.name === p.name ? 'ring-4 ring-cyan-400' : ''}`}
+                            className={`bg-slate-400 font-semibold rounded-lg p-2 drop-shadow-xl text-slate-800 ${player.vote === p.name ? 'ring-4 ring-cyan-400' : ''}`}
                             onClick={() => handleVote(p)}
+                            key={index}
                         >
                             <span>{p.response}</span>
                             <span className="float-right text-slate-600">{amountOfVotes(p)}</span>

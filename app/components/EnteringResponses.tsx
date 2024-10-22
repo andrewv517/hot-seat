@@ -1,9 +1,22 @@
 import { useState } from "react"
-import { socket } from "../socket";
-import { Game, PlayerData } from "../types";
+import { headers, socket } from "../socket";
+import { API_URL, Game, PlayerData } from "../types";
 
 export default function EnteringResponses({ isInHotSeat, game, player }: { isInHotSeat: boolean, game: Game, player: PlayerData }) {
     const [response, setResponse] = useState('');
+
+    function handleResponse() {
+        fetch(`${API_URL}/response`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+                socketId: socket.id,
+                gameName: game.id,
+                response,
+                playerName: player.name,
+            })
+        })
+    }
 
     return (
         <div className="space-y-5">
@@ -43,7 +56,7 @@ export default function EnteringResponses({ isInHotSeat, game, player }: { isInH
                 <button
                     className="bg-green-500 disabled:bg-gray-500 p-2 pl-3 pr-3 h-fit text-white font-semibold rounded-lg drop-shadow-xl"
                     disabled={response.length === 0}
-                    onClick={() => socket.emit('response', { response, game, player })}
+                    onClick={handleResponse}
                     >Submit
                 </button>
             </div>

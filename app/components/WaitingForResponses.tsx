@@ -11,8 +11,9 @@ export default function WaitingForResponses({ game }: { game: Game }) {
             <p className="text-md text-gray-400 text-center">Please wait the following to submit their responses...</p>
             <div className="grid grid-cols-2 gap-4 m-auto mt-3">
                 {
-                    nonSubmitted().map(player => (
+                    nonSubmitted().map((player, index) => (
                         <div
+                            key={index}
                             className="bg-slate-400 font-semibold rounded-lg p-2 drop-shadow-xl text-slate-800"
                         >
                             {player.name}
