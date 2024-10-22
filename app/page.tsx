@@ -24,7 +24,7 @@ export default function Home() {
       const oldName = cookies["hot-seat-cookie"];
       console.log({ name: oldName });
       if (oldName) {
-        const res = await fetch(`${API_URL}/game?name=${oldName}`);
+        const res = await fetch(`${API_URL}/game?name=${String(oldName)}`);
         const json: { game: Game | undefined, player: PlayerData | null } = await res.json();
         console.log(json);
         if (json.game && json.player) {

@@ -32,7 +32,7 @@ export default function LandingPage() {
 
         const priorName = cookies["hot-seat-cookie"];
         if (priorName) {
-            hideModal(priorName, actionParam, gameName);
+            hideModal(String(priorName), actionParam, gameName);
         } else {
             setActionState(actionParam);
             setShowingModal(true)
