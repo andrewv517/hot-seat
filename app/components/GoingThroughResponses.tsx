@@ -1,5 +1,5 @@
 import { headers, socket } from "../socket";
-import { API_URL, Game, PlayerData } from "../types";
+import { API_URL, Game } from "../types";
 
 export default function GoingThroughResponses({ isInHotSeat, game }: { isInHotSeat: boolean, game: Game }) {
 
@@ -34,7 +34,7 @@ export default function GoingThroughResponses({ isInHotSeat, game }: { isInHotSe
                     <p
                         className="text-md text-gray-400 text-center"
                     >
-                        It's your job to scroll through and read them!
+                        It&#39;s your job to scroll through and read them!
                     </p> :
                     <p
                         className="text-md text-gray-400 text-center"
@@ -82,7 +82,7 @@ export default function GoingThroughResponses({ isInHotSeat, game }: { isInHotSe
                         <p
                             className="font-semibold text-md text-slate-400 text-center"
                         >
-                            Once you're done reading, click below.
+                            Once you&#39;re done reading, click below.
                         </p>
                         <button
                             className="bg-cyan-500 m-auto p-2 pl-3 pr-3 h-fit text-white font-semibold rounded-lg drop-shadow-xl"

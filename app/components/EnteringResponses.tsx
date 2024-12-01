@@ -42,7 +42,7 @@ export default function EnteringResponses({ isInHotSeat, game, player }: { isInH
                 </p>
                 <ul className="text-gray-400 text-md ">
                     <li>1 point for each player that guesses your answer.</li>
-                    <li>2 points for guessing the player in the Hot Seat's answer correctly</li>
+                    <li>2 points for guessing the player in the Hot Seat&#39;s answer correctly</li>
                     <li>4 points for responding with the same answer as the player in the Hot Seat</li>
                 </ul>
             </div>
