@@ -21,5 +21,5 @@ export interface Game {
   seconds: number,
 }
 
-export const API_URL = process.env.NODE_ENV === 'development' ? 'http://192.168.1.132:8000' : 'https://hotseatapi.andrewvadeika.com'
+export const API_URL = process.env.NODE_ENV === 'development' ? 'http://192.168.1.132:8000' : 'https://hot-seat-server.onrender.com'
 export const COOKIE_NAME = 'hot-seat-cookie';
